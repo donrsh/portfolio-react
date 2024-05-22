@@ -3,6 +3,7 @@
  * It relies on recommended configs out of the box for simplicity, but you can
  * and should modify this configuration to best suit your team's needs.
  */
+import path from "node:path";
 
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
@@ -46,6 +47,10 @@ module.exports = {
         ],
         "import/resolver": {
           typescript: {},
+          alias: {
+            map: [["~", path.resolve(__dirname, "./app")]],
+            extensions: [".js", ".jsx", ".ts", ".d.ts", ".tsx"],
+          },
         },
       },
     },
