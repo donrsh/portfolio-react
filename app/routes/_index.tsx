@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -14,12 +15,22 @@ export default function Index() {
       <p>
         This site serves as a portfolio of my react skill.
         <br />
-        It is based on Vite, and also an app under my{" "}
+        It is based on <a href="https://vitejs.dev/">Vite</a> and{" "}
+        <a href="https://remix.run/">Remix</a>, and also an app under my{" "}
         <a href="https://github.com/donrsh/web-apps-workspace/tree/main">
           web apps workspace
         </a>{" "}
-        project .
+        project.
       </p>
+
+      <h2>Demos</h2>
+      <ul>
+        <li>
+          <Link to="/demo/use-toggler">
+            react hook: <code>useToggler</code>
+          </Link>
+        </li>
+      </ul>
     </div>
   );
 }
