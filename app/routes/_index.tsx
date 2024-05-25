@@ -30,6 +30,11 @@ export default function Index() {
             react hook: <code>useToggler</code>
           </Link>
         </li>
+        <li>
+          <Link to="/demo/useTmpAuthorization-zustand">
+            react hook: <code>useTmpAuthorization</code> (impl w/ zustand)
+          </Link>
+        </li>
       </ul>
     </div>
   );
