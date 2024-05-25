@@ -1,0 +1,64 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout workspace repo
+        uses: actions/checkout@v4
+        with:
+          repository: donrsh/web-apps-workspace
+
+      - name: Checkout workspace repo
+        uses: actions/checkout@v4
+        with:
+          path: apps/app
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: corepack enable
+        run: corepack enable
+
+      - name: install workspace deps
+        run: pnpm install
+
+      - name: install app deps
+        working-directory: apps/app
+        run: pnpm run install-deps
+
+      - name: Build project
+        working-directory: apps/app
+        run: pnpm run build
+
+      - name: Upload production-ready build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-files
+          path: apps/app/build/client
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-files
+          path: ./dist
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
