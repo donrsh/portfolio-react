@@ -1,4 +1,4 @@
-import { createTmpAuthorizationStore } from "@react-hook/useTmpAuthorization/zustand";
+import { createTmpAuthorizationStore } from "@lib-react/hooks/useTmpAuthorization/zustand";
 import {
   FormEventHandler,
   useCallback,
