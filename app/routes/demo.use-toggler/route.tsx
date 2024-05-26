@@ -1,22 +1,6 @@
 import useToggler from "@lib-react/hooks/useToggler";
-import SourceCodeRefs, {
-  ReferenceEntry,
-} from "@lib-react/components/SourceCodeRefs";
-
-const sourceCodeReferences: ReferenceEntry[] = [
-  {
-    title: "This page",
-    link: "https://github.com/donrsh/portfolio-react/blob/main/app/routes/demo.use-toggler.tsx",
-  },
-  {
-    title: (
-      <>
-        <code>useToggler</code> hook
-      </>
-    ),
-    link: "https://github.com/donrsh/web-apps-workspace/tree/main/libs/react/src/hooks/useToggler",
-  },
-];
+import SourceCodeRefs from "@lib-react/components/SourceCodeRefs";
+import { sourceCodeReferences } from "./metadata";
 
 const popoverId = "popover";
 
