@@ -26,7 +26,7 @@ export default function Index() {
       <h2>Demos</h2>
       <ul>
         <li>
-          <Link to="/demo/use-toggler">
+          <Link to="/demo/useToggler">
             react hook: <code>useToggler</code>
           </Link>
         </li>
