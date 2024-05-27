@@ -3,7 +3,7 @@ import { ReferenceEntry } from "@lib-react/components/SourceCodeRefs";
 export const sourceCodeReferences: ReferenceEntry[] = [
   {
     title: "This page",
-    link: "https://github.com/donrsh/portfolio-react/blob/main/app/routes/demo.use-toggler.tsx",
+    link: "https://github.com/donrsh/portfolio-react/blob/main/app/routes/demo.useToggler/route.tsx",
   },
   {
     title: (

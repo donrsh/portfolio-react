@@ -3,7 +3,7 @@ import { ReferenceEntry } from "@lib-react/components/SourceCodeRefs";
 export const sourceCodeReferences: ReferenceEntry[] = [
   {
     title: "This page",
-    link: "https://github.com/donrsh/portfolio-react/blob/main/app/routes/demo.useTmpAuthorization-zustand.tsx",
+    link: "https://github.com/donrsh/portfolio-react/blob/main/app/routes/demo.useTmpAuthorization-zustand/route.tsx",
   },
   {
     title: (
