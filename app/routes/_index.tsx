@@ -36,6 +36,13 @@ export default function Index() {
           </Link>
         </li>
       </ul>
+
+      <h2>Applets</h2>
+      <ul>
+        <li>
+          <Link to="/applet/fullscreen-emoji">Fullscreen Emoji</Link>
+        </li>
+      </ul>
     </div>
   );
 }
