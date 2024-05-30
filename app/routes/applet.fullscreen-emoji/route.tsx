@@ -1,16 +1,10 @@
 import useToggler from "@lib-react/hooks/useToggler";
 import { createSub } from "@lib-react/utils/createSub";
-import {
-  ComponentProps,
-  KeyboardEventHandler,
-  useCallback,
-  useEffect,
-  type PropsWithChildren,
-} from "react";
+import { KeyboardEventHandler, useCallback, useEffect } from "react";
 import "./styles.css";
 
 const Sub = createSub({
-  Dialog: ({ emoji, onClose }: { emoji: string; onClose: Function }) => {
+  Dialog: ({ emoji }: { emoji: string; onClose: () => void }) => {
     return (
       <div className="dialog center" style={{}}>
         <div className="emoji">{emoji}</div>
@@ -27,16 +21,19 @@ export default function Page() {
     data: emoji,
   } = useToggler<string>();
 
-  const onKeyUp: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    const value = (e.currentTarget.value ?? "").trim();
+  const onKeyUp: KeyboardEventHandler<HTMLInputElement> = useCallback(
+    (e) => {
+      const value = (e.currentTarget.value ?? "").trim();
 
-    if (!value) return;
+      if (!value) return;
 
-    if (e.key === "Enter") {
-      e.currentTarget.value = "";
-      openDialog(value);
-    }
-  };
+      if (e.key === "Enter") {
+        e.currentTarget.value = "";
+        openDialog(value);
+      }
+    },
+    [openDialog]
+  );
 
   useEffect(() => {
     const closeDialogOnEscape = (e: KeyboardEvent) => {
@@ -48,7 +45,7 @@ export default function Page() {
     window.addEventListener("keydown", closeDialogOnEscape);
 
     return () => window.removeEventListener("keydown", closeDialogOnEscape);
-  }, []);
+  }, [closeDialog]);
 
   return (
     <div>
