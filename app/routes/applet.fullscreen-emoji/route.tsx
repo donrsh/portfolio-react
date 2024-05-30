@@ -57,6 +57,7 @@ export default function Page() {
 
       if (e.key === "Enter") {
         e.currentTarget.value = "";
+        e.currentTarget.blur();
         openDialog(value);
       }
     },
