@@ -5,14 +5,27 @@ import {
   type MouseEventHandler,
   useCallback,
   useEffect,
+  useRef,
 } from "react";
+import SwipeListener from "swipe-listener";
 import { getEmojiCache, cacheEmojiUse } from "./cache";
 import "./styles.css";
 
 const Sub = createSub({
-  Dialog: ({ emoji }: { emoji: string; onClose: () => void }) => {
+  Dialog: ({ emoji, onClose }: { emoji: string; onClose: () => void }) => {
+    const ref = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+      const root = ref.current;
+      if (!root) return;
+
+      SwipeListener(root);
+      root.addEventListener("swipe", onClose);
+      return () => root.removeEventListener("swipe", onClose);
+    }, [onClose]);
+
     return (
-      <div className="dialog center" style={{}}>
+      <div ref={ref} className="dialog center" style={{}}>
         <div className="emoji">{emoji}</div>
       </div>
     );
