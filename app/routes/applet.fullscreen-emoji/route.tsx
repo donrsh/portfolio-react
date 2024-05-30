@@ -105,7 +105,7 @@ export default function Page() {
         <label>
           <span>Choose an emoji and hit enter</span>
           <br />
-          <input type="text" onKeyUp={onKeyUp} />
+          <input type="text" onKeyUp={onKeyUp} style={{ fontSize: 20 }} />
         </label>
         <hr />
         <div className="shortcut-buttons">
@@ -115,6 +115,7 @@ export default function Page() {
                 data-emoji={x.emoji}
                 key={x.emoji}
                 onClick={onShortcutButtonClick}
+                style={{ fontSize: 20 }}
               >
                 {x.emoji}
               </button>
