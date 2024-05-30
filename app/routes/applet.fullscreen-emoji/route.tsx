@@ -10,6 +10,7 @@ import {
 import SwipeListener from "swipe-listener";
 import { getEmojiCache, cacheEmojiUse } from "./cache";
 import "./styles.css";
+import emojiFavicon from "./emoji-favicon.png";
 
 const Sub = createSub({
   Dialog: ({ emoji, onClose }: { emoji: string; onClose: () => void }) => {
@@ -84,6 +85,18 @@ export default function Page() {
 
     return () => window.removeEventListener("keydown", closeDialogOnEscape);
   }, [closeDialog]);
+
+  // Change icon dynamically
+  useEffect(() => {
+    let link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = emojiFavicon;
+  }, []);
 
   return (
     <>
