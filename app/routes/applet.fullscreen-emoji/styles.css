@@ -11,3 +11,8 @@
     font-size: 256px;
   }
 }
+
+.shortcut-buttons {
+  display: flex;
+  gap: 8px;
+}

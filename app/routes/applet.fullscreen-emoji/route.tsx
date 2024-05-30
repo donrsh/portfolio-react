@@ -1,6 +1,12 @@
 import useToggler from "@lib-react/hooks/useToggler";
 import { createSub } from "@lib-react/utils/createSub";
-import { KeyboardEventHandler, useCallback, useEffect } from "react";
+import {
+  type KeyboardEventHandler,
+  type MouseEventHandler,
+  useCallback,
+  useEffect,
+} from "react";
+import { getEmojiCache, cacheEmojiUse } from "./cache";
 import "./styles.css";
 
 const Sub = createSub({
@@ -16,10 +22,18 @@ const Sub = createSub({
 export default function Page() {
   const {
     isOpen: isDialogOpen,
-    openWithData: openDialog,
+    openWithData: rawOpenDialog,
     close: closeDialog,
     data: emoji,
   } = useToggler<string>();
+
+  const openDialog = useCallback(
+    (emoji: string) => {
+      rawOpenDialog(emoji);
+      cacheEmojiUse(emoji);
+    },
+    [rawOpenDialog]
+  );
 
   const onKeyUp: KeyboardEventHandler<HTMLInputElement> = useCallback(
     (e) => {
@@ -35,6 +49,17 @@ export default function Page() {
     [openDialog]
   );
 
+  const onShortcutButtonClick: MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      (e) => {
+        const emoji = e.currentTarget.dataset["emoji"];
+        if (emoji) {
+          openDialog(emoji);
+        }
+      },
+      [openDialog]
+    );
+
   useEffect(() => {
     const closeDialogOnEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -48,13 +73,29 @@ export default function Page() {
   }, [closeDialog]);
 
   return (
-    <div>
-      <label>
-        <span>Choose an emoji and hit enter</span>
-        <br />
-        <input type="text" onKeyUp={onKeyUp} />
-      </label>
+    <>
       {isDialogOpen && <Sub.Dialog emoji={emoji!} onClose={closeDialog} />}
-    </div>
+      <div>
+        <label>
+          <span>Choose an emoji and hit enter</span>
+          <br />
+          <input type="text" onKeyUp={onKeyUp} />
+        </label>
+        <hr />
+        <div className="shortcut-buttons">
+          {getEmojiCache().map((x) => {
+            return (
+              <button
+                data-emoji={x.emoji}
+                key={x.emoji}
+                onClick={onShortcutButtonClick}
+              >
+                {x.emoji}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 }
