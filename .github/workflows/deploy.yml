@@ -38,6 +38,10 @@ jobs:
         working-directory: apps/app
         run: BASE_URL=/${{ github.event.repository.name }}/ pnpm run build
 
+      - name: Copy index.html as 404.html to catch all routes
+        working-directory: apps/app/build/client
+        run: cp index.html 404.html
+
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
