@@ -116,11 +116,14 @@ export default function Page() {
       {isDialogOpen && <Sub.Dialog emoji={emoji!} onClose={closeDialog} />}
       <div>
         <form {...{ onSubmit }}>
-          <label className="row-vcenter" style={{ gap: 8 }}>
-            <span>Emoji</span>
-            <br />
-            <input name="emoji" {...{ onKeyUp }} style={{ fontSize: 20 }} />
-            <button type="submit" style={{ paddingBlock: 4 }}>
+          <label className="row-vcenter" style={{ gap: 8, width: "100%" }}>
+            <span style={{ flex: 0 }}>Emoji</span>
+            <input
+              name="emoji"
+              {...{ onKeyUp }}
+              style={{ flex: 1, fontSize: 20 }}
+            />
+            <button type="submit" style={{ flex: 0, paddingBlock: 4 }}>
               Show!
             </button>
           </label>
