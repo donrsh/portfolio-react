@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useRef,
+  FormEventHandler,
 } from "react";
 import SwipeListener from "swipe-listener";
 import { getEmojiCache, cacheEmojiUse } from "./cache";
@@ -49,20 +50,31 @@ export default function Page() {
     [rawOpenDialog]
   );
 
-  const onKeyUp: KeyboardEventHandler<HTMLInputElement> = useCallback(
+  const onSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     (e) => {
-      const value = (e.currentTarget.value ?? "").trim();
+      e.preventDefault();
 
-      if (!value) return;
+      const formEl = e.currentTarget;
+      const formData = new FormData(e.currentTarget);
+      const emoji = (formData.get("emoji") as string)?.trim();
+      const emojiInput = formEl.querySelector(
+        "input[name='emoji']"
+      ) as HTMLInputElement;
 
-      if (e.key === "Enter") {
-        e.currentTarget.value = "";
-        e.currentTarget.blur();
-        openDialog(value);
+      if (emoji && emojiInput) {
+        emojiInput.blur();
+        emojiInput.value = "";
+        openDialog(emoji);
       }
     },
     [openDialog]
   );
+
+  const onKeyUp: KeyboardEventHandler<HTMLInputElement> = useCallback((e) => {
+    if (e.key === "Enter") {
+      e.currentTarget.form?.submit();
+    }
+  }, []);
 
   const onShortcutButtonClick: MouseEventHandler<HTMLButtonElement> =
     useCallback(
@@ -103,11 +115,16 @@ export default function Page() {
     <>
       {isDialogOpen && <Sub.Dialog emoji={emoji!} onClose={closeDialog} />}
       <div>
-        <label>
-          <span>Choose an emoji and hit enter</span>
-          <br />
-          <input type="text" onKeyUp={onKeyUp} style={{ fontSize: 20 }} />
-        </label>
+        <form {...{ onSubmit }}>
+          <label className="row-vcenter" style={{ gap: 8 }}>
+            <span>Emoji</span>
+            <br />
+            <input name="emoji" {...{ onKeyUp }} style={{ fontSize: 20 }} />
+            <button type="submit" style={{ paddingBlock: 4 }}>
+              Show!
+            </button>
+          </label>
+        </form>
         <hr />
         <div className="shortcut-buttons">
           {getEmojiCache().map((x) => {
