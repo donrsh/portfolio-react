@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
   return {
     base,
     server: {
+      host: true,
       port: Number(env.VITE_DEV_PORT),
       open: true,
     },
