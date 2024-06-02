@@ -121,7 +121,7 @@ export default function Page() {
             <input
               name="emoji"
               {...{ onKeyUp }}
-              style={{ flex: 1, fontSize: 20 }}
+              style={{ flex: 1, minWidth: 120, fontSize: 20 }}
             />
             <button type="submit" style={{ flex: 0, paddingBlock: 4 }}>
               Show!
