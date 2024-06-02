@@ -28,7 +28,7 @@ const Sub = createSub({
     );
 
     return (
-      <div>
+      <div style={{ marginBlock: 16 }}>
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#" style={{ fontStyle: "oblique" }} onClick={onClick}>
           What is this for?
