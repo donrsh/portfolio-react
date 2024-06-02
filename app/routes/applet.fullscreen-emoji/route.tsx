@@ -12,9 +12,54 @@ import SwipeListener from "swipe-listener";
 import { getEmojiCache, cacheEmojiUse } from "./cache";
 import "./styles.css";
 import emojiFavicon from "./emoji-favicon.png";
+import whyYouNeedThisApp_Image from "./images/Why-you-need-an-app-for-full-screen-emoji.png";
 
 const Sub = createSub({
-  Dialog: ({ emoji, onClose }: { emoji: string; onClose: () => void }) => {
+  WhatIsThisAppFor: () => {
+    const dialog = useToggler();
+
+    const onClick: MouseEventHandler<HTMLAnchorElement> = useCallback(
+      (e) => {
+        e.preventDefault();
+
+        dialog.open();
+      },
+      [dialog]
+    );
+
+    return (
+      <div>
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+        <a href="#" style={{ fontStyle: "oblique" }} onClick={onClick}>
+          What is this for?
+        </a>
+
+        <dialog open={dialog.isOpen} onClose={dialog.close}>
+          <img
+            src={whyYouNeedThisApp_Image}
+            alt=""
+            style={{ width: "100%", maxWidth: 500 }}
+          />
+          <div className="row-vcenter" style={{ gap: 8 }}>
+            <span>Source</span>
+            <a
+              href="https://www.youtube.com/watch?v=TfNnpsYATbQ"
+              target="_blank"
+              rel="noreferrer"
+              style={{ flex: 1 }}
+            >
+              TBBT S10E14: The Emotion Detection Automation
+            </a>
+            <button onClick={dialog.close} style={{ marginLeft: "auto" }}>
+              OK
+            </button>
+          </div>
+        </dialog>
+      </div>
+    );
+  },
+
+  EmojiDialog: ({ emoji, onClose }: { emoji: string; onClose: () => void }) => {
     const ref = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -113,7 +158,7 @@ export default function Page() {
 
   return (
     <>
-      {isDialogOpen && <Sub.Dialog emoji={emoji!} onClose={closeDialog} />}
+      {isDialogOpen && <Sub.EmojiDialog emoji={emoji!} onClose={closeDialog} />}
       <div>
         <form {...{ onSubmit }}>
           <label className="row-vcenter" style={{ gap: 8, width: "100%" }}>
@@ -128,7 +173,9 @@ export default function Page() {
             </button>
           </label>
         </form>
-        <hr />
+
+        <Sub.WhatIsThisAppFor />
+
         <div className="shortcut-buttons">
           {getEmojiCache().map((x) => {
             return (
