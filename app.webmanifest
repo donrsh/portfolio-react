@@ -1,6 +1,6 @@
 {
   "name": "Portfolio React",
-  "start_url": "/applet/fullscreen-emoji",
+  "start_url": ".",
   "display": "standalone",
   "icons": [
     {
