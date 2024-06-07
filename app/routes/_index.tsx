@@ -1,11 +1,17 @@
 import type { MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
+import { type ComponentProps } from "react";
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix SPA" },
-    { name: "description", content: "Welcome to Remix (SPA Mode)!" },
-  ];
+  return [{ title: "Donrsh | React Portfolio" }];
+};
+
+const ExternalLink = (props: ComponentProps<"a">) => {
+  return (
+    <a {...props} target="_blank" rel="noreferrer">
+      {props.children!}
+    </a>
+  );
 };
 
 export default function Index() {
@@ -13,14 +19,23 @@ export default function Index() {
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
       <h1>React Portfolio</h1>
       <p>
-        This site serves as a portfolio of my react skill.
+        This site serves as a portfolio of my{" "}
+        <ExternalLink href="https://react.dev/">React</ExternalLink> skill.
         <br />
-        It is based on <a href="https://vitejs.dev/">Vite</a> and{" "}
-        <a href="https://remix.run/">Remix</a>, and also an app under my{" "}
-        <a href="https://github.com/donrsh/web-apps-workspace/tree/main">
+        It is based on{" "}
+        <ExternalLink href="https://vitejs.dev/">Vite</ExternalLink> and{" "}
+        <ExternalLink href="https://remix.run/">Remix</ExternalLink>, and also
+        an app under my{" "}
+        <ExternalLink href="https://github.com/donrsh/web-apps-workspace/tree/main">
           web apps workspace
-        </a>{" "}
+        </ExternalLink>{" "}
         project.
+        <br />
+        This site is a{" "}
+        <ExternalLink href="https://web.dev/articles/what-are-pwas?hl=zh-tw">
+          Progress Web App (PWA)
+        </ExternalLink>{" "}
+        as well. You can install it to your mobile devices.
       </p>
 
       <h2>Demos</h2>
@@ -40,7 +55,7 @@ export default function Index() {
       <h2>Applets</h2>
       <ul>
         <li>
-          <Link to="/applet/fullscreen-emoji">Fullscreen Emoji</Link>
+          <Link to="/applet/fullscreen-emoji">Full Screen Emoji</Link>
         </li>
       </ul>
     </div>

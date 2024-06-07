@@ -16,6 +16,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
           rel="manifest"
           href={`${import.meta.env.BASE_URL}app.webmanifest`}
         ></link>
+        <link
+          rel="shortcut icon"
+          href="react-favicon.png"
+          type="image/x-icon"
+        />
         <Meta />
         <Links />
       </head>
