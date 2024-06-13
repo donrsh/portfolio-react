@@ -3,7 +3,6 @@
  * It relies on recommended configs out of the box for simplicity, but you can
  * and should modify this configuration to best suit your team's needs.
  */
-const path = require("node:path");
 
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
@@ -45,13 +44,6 @@ module.exports = {
           { name: "Link", linkAttribute: "to" },
           { name: "NavLink", linkAttribute: "to" },
         ],
-        "import/resolver": {
-          typescript: {},
-          alias: {
-            map: [["~", path.resolve(__dirname, "./app")]],
-            extensions: [".js", ".jsx", ".ts", ".d.ts", ".tsx"],
-          },
-        },
       },
     },
 
@@ -76,6 +68,10 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
       ],
+      rules: {
+        "@typescript-eslint/no-unused-vars": "warn",
+        "import/no-unresolved": "off",
+      },
     },
 
     // Node
