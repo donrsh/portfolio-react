@@ -50,6 +50,11 @@ export default function Index() {
             react hook: <code>useTmpAuthorization</code> (impl w/ zustand)
           </Link>
         </li>
+        <li>
+          <Link to="/demo/useAnimateOnUpdate">
+            react hook: <code>useAnimateOnUpdate</code>
+          </Link>
+        </li>
       </ul>
 
       <h2>Applets</h2>

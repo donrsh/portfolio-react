@@ -1,0 +1,16 @@
+@keyframes outlineBlink {
+  from,
+  to {
+    outline-color: #4074c8;
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
+.outline-blink {
+  outline: 2px solid;
+  outline-color: transparent;
+  /* add 'border-color: transparent' if you wish no border to show initially */
+  animation: outlineBlink 0.3s linear;
+}
