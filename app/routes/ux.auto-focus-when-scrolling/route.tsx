@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useReducer } from "react";
 import { createSub } from "@lib-react/utils/createSub";
-import { StoreProvider, targetDataKey, useStore } from "./store";
+import { StoreProvider, useStore } from "./store";
 
 type Item = {
   id: any;
@@ -26,10 +26,10 @@ let items = new Array(20).fill(null).map((_, idx) => createItem(idx));
 
 const Sub = createSub({
   Status: () => {
-    const [scrollingDirection, inViewEls, focusEl] = useStore((x) => [
+    const [scrollingDirection, inViewItemEls, focusItemEl] = useStore((x) => [
       x.scrollingDirection,
-      x.inViewEls,
-      x.focusEl,
+      x.inViewItemEls,
+      x.focusItemEl,
     ]);
 
     return (
@@ -45,18 +45,18 @@ const Sub = createSub({
         <br />
         <code>
           <b>items in view</b>:{" "}
-          {[...inViewEls].map((x) => x.dataset.title).join(", ")}
+          {[...inViewItemEls].map((x) => x.dataset.title).join(", ")}
         </code>
         <br />
         <code>
-          <b>focus item</b>: {focusEl?.dataset.title}
+          <b>focus item</b>: {focusItemEl?.dataset.title}
         </code>
       </div>
     );
   },
 
   Item: ({ id, title, text }: Item) => {
-    const { ref, isFocus, focus } = useStore((x) => x.useTarget());
+    const { ref, isFocus, focus } = useStore((x) => x.useItem());
 
     return (
       <div
@@ -80,7 +80,7 @@ const Sub = createSub({
   },
 
   Items: () => {
-    const scrollRef = useStore((x) => x.scrollRef);
+    const scrollRef = useStore((x) => x.scrollContainerRef);
     const [, update] = useReducer((x) => x + 1, 0);
 
     const addItem = useCallback(() => {
@@ -110,11 +110,11 @@ const Sub = createSub({
   },
 
   FocusItem: () => {
-    const focusEl = useStore((x) => x.focusEl);
+    const focusItemEl = useStore((x) => x.focusItemEl);
 
     const focusItem = useMemo(() => {
-      return items.find((x) => x.id == focusEl?.dataset?.id);
-    }, [focusEl]);
+      return items.find((x) => x.id == focusItemEl?.dataset?.id);
+    }, [focusItemEl]);
 
     return (
       focusItem && (

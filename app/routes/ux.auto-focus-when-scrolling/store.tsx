@@ -14,18 +14,21 @@ type ScrollingDirection = "upward" | "downward";
 export const targetDataKey = "data-observer-target";
 
 type StoreFields = {
-  scrollEl: HTMLElement | null;
-  scrollRef: (el: HTMLElement) => void;
-  scrollElObserver: IntersectionObserver | null;
-  setScrollElObserver: (obeserver: IntersectionObserver | null) => void;
+  scrollContainer: HTMLElement | null;
+  scrollContainerRef: (el: HTMLElement) => void;
+  scrollContainerObserver: IntersectionObserver | null;
+  setScrollContainerObserver: (obeserver: IntersectionObserver | null) => void;
   scrollingDirection: ScrollingDirection | null;
   setScrollingDirection: (scrollingDirection?: ScrollingDirection) => void;
-  inViewEls: Set<HTMLElement>;
-  setInViewEls: (inViewEls: HTMLElement[], notInViewEls: HTMLElement[]) => void;
-  focusEl: HTMLElement | null;
-  setFocusEl: (focusEl: HTMLElement | null) => void;
-  updateFocusEl: () => void;
-  useTarget: () => {
+  inViewItemEls: Set<HTMLElement>;
+  setInViewItemEls: (
+    inViewEls: HTMLElement[],
+    notInViewEls: HTMLElement[]
+  ) => void;
+  focusItemEl: HTMLElement | null;
+  setFocusItemEl: (itemEl: HTMLElement | null) => void;
+  updateFocus: () => void;
+  useItem: () => {
     ref: any;
     isFocus: boolean;
     focus: () => void;
@@ -39,71 +42,78 @@ const useStoreContext = () => useContext(StoreContext);
 
 const store = create<StoreFields>((set, get, api) => {
   return {
-    scrollEl: null,
-    scrollRef(el) {
-      set({ scrollEl: el });
+    scrollContainer: null,
+    scrollContainerRef(el) {
+      set({ scrollContainer: el });
     },
-    scrollElObserver: null,
-    setScrollElObserver(obeserver) {
-      set({ scrollElObserver: obeserver });
+    scrollContainerObserver: null,
+    setScrollContainerObserver(obeserver) {
+      set({ scrollContainerObserver: obeserver });
     },
     scrollingDirection: null,
     setScrollingDirection(scrollingDirection) {
       set({ scrollingDirection: scrollingDirection ?? null });
     },
-    inViewEls: new Set(),
-    setInViewEls(inViewEls, notInViewEls) {
-      const { inViewEls: currentInViewEls } = get();
+    inViewItemEls: new Set(),
+    setInViewItemEls(inViewEls, notInViewEls) {
+      const { inViewItemEls: current } = get();
 
-      inViewEls.forEach((x) => currentInViewEls.add(x));
-      notInViewEls.forEach((x) => currentInViewEls.delete(x));
+      inViewEls.forEach((x) => current.add(x));
+      notInViewEls.forEach((x) => current.delete(x));
 
-      set({ inViewEls: new Set(currentInViewEls) });
+      set({ inViewItemEls: new Set(current) });
     },
 
-    focusEl: null,
-    setFocusEl(focusEl) {
-      set({ focusEl });
+    focusItemEl: null,
+    setFocusItemEl(focusEl) {
+      set({ focusItemEl: focusEl });
     },
-    updateFocusEl() {
-      const { inViewEls, scrollEl, scrollingDirection, focusEl } = get();
+    updateFocus() {
+      const {
+        inViewItemEls: inViewItemEls,
+        scrollContainer: scrollContainer,
+        scrollingDirection,
+        focusItemEl: focusItemEl,
+      } = get();
 
-      if (inViewEls.has(focusEl!)) return;
+      if (inViewItemEls.has(focusItemEl!)) return;
 
       let targets = [
-        ...(scrollEl?.querySelectorAll(`[${targetDataKey}='true']`) ?? []),
+        ...(scrollContainer?.querySelectorAll(`[${targetDataKey}='true']`) ??
+          []),
       ];
 
       if (scrollingDirection === "upward") {
         targets.reverse();
       }
 
-      const nextFocusEl = (targets.find((x) => inViewEls.has(x as any)) ??
-        null) as any;
-      set({ focusEl: nextFocusEl });
+      const nextFocusItemEl = (targets.find((x) =>
+        inViewItemEls.has(x as any)
+      ) ?? null) as any;
+      set({ focusItemEl: nextFocusItemEl });
     },
 
-    useTarget() {
+    useItem() {
       const ref = useRef<HTMLElement>();
-      const [focusEl, setFocusEl, scrollElObserver] = useStoreContext()((x) => [
-        x.focusEl,
-        x.setFocusEl,
-        x.scrollElObserver,
-      ]);
+      const [focusItemEl, setFocusItemEl, scrollContainerObserver] =
+        useStoreContext()((x) => [
+          x.focusItemEl,
+          x.setFocusItemEl,
+          x.scrollContainerObserver,
+        ]);
 
       useEffect(() => {
-        if (ref.current && scrollElObserver) {
-          console.log("useTarget", ref.current, scrollElObserver);
+        if (ref.current && scrollContainerObserver) {
           ref.current.setAttribute(targetDataKey, "true");
-          scrollElObserver?.observe(ref.current);
+          scrollContainerObserver?.observe(ref.current);
         }
-      }, [scrollElObserver]);
+      }, [scrollContainerObserver]);
 
-      const isFocus = focusEl === ref.current;
+      const isFocus = focusItemEl === ref.current;
 
       const focus = useCallback(() => {
-        setFocusEl(ref.current!);
-      }, [setFocusEl]);
+        setFocusItemEl(ref.current!);
+      }, [setFocusItemEl]);
 
       return useMemo(
         () => ({
@@ -121,59 +131,59 @@ export const useStore = store;
 
 export const StoreProvider = ({ children }: PropsWithChildren) => {
   const [
-    scrollEl,
+    scrollContainer,
     setScrollingDirection,
-    setInViewEls,
-    setScrollElObserver,
-    updateFocusEl,
+    setInViewItemEls,
+    setScrollContainerObserver,
+    updateFocus,
   ] = useStore((x) => [
-    x.scrollEl,
+    x.scrollContainer,
     x.setScrollingDirection,
-    x.setInViewEls,
-    x.setScrollElObserver,
-    x.updateFocusEl,
+    x.setInViewItemEls,
+    x.setScrollContainerObserver,
+    x.updateFocus,
   ]);
 
   useEffect(() => {
-    if (!scrollEl) return;
+    if (!scrollContainer) return;
 
     const handler = (e: WheelEvent) => {
       const scrollingDirection = e.deltaY > 0 ? "downward" : "upward";
       setScrollingDirection(scrollingDirection);
-      updateFocusEl();
+      updateFocus();
     };
 
-    scrollEl.addEventListener("wheel", handler);
-    return () => scrollEl.removeEventListener("wheel", handler);
-  }, [scrollEl, setScrollingDirection, updateFocusEl]);
+    scrollContainer.addEventListener("wheel", handler);
+    return () => scrollContainer.removeEventListener("wheel", handler);
+  }, [scrollContainer, setScrollingDirection, updateFocus]);
 
   useEffect(() => {
-    if (!scrollEl) {
-      setScrollElObserver(null);
+    if (!scrollContainer) {
+      setScrollContainerObserver(null);
       return;
     }
 
     const observer = new IntersectionObserver(
       (entries, observers) => {
-        setInViewEls(
+        setInViewItemEls(
           entries.filter((x) => x.isIntersecting).map((x) => x.target as any),
           entries.filter((x) => !x.isIntersecting).map((x) => x.target as any)
         );
       },
       {
-        root: scrollEl,
+        root: scrollContainer,
         threshold: 1,
         // @ts-ignore
         // delay: 1000,
       }
     );
 
-    setScrollElObserver(observer);
+    setScrollContainerObserver(observer);
 
     return () => {
       observer.disconnect();
     };
-  }, [scrollEl, setInViewEls, setScrollElObserver]);
+  }, [scrollContainer, setInViewItemEls, setScrollContainerObserver]);
 
   return (
     <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
