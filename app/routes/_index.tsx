@@ -63,6 +63,15 @@ export default function Index() {
           <Link to="/applet/fullscreen-emoji">Full Screen Emoji</Link>
         </li>
       </ul>
+
+      <h2>UX</h2>
+      <ul>
+        <li>
+          <Link to="/ux/auto-focus-when-scrolling">
+            Auto Focus when Scrolling
+          </Link>
+        </li>
+      </ul>
     </div>
   );
 }
