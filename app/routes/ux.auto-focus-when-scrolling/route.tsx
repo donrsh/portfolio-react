@@ -23,14 +23,23 @@ const createItem = (idx: number) => ({
 });
 
 let items = new Array(20).fill(null).map((_, idx) => createItem(idx));
+const getItemByKey = (key: any) => items.find((x) => x.id === key) ?? null;
 
 const Sub = createSub({
   Status: () => {
-    const [scrollingDirection, inViewItemEls, focusItemEl] = useStore((x) => [
+    const [scrollingDirection, inViewItemKeys, focusItemKey] = useStore((x) => [
       x.scrollingDirection,
-      x.inViewItemEls,
-      x.focusItemEl,
+      x.inViewItemKeys,
+      x.focusItemKey,
     ]);
+
+    const inViewItems = useMemo(() => {
+      return inViewItemKeys ? [...inViewItemKeys].map(getItemByKey) : [];
+    }, [inViewItemKeys]);
+
+    const focusItem = useMemo(() => {
+      return getItemByKey(focusItemKey);
+    }, [focusItemKey]);
 
     return (
       <div style={{ marginBottom: 20 }}>
@@ -44,19 +53,18 @@ const Sub = createSub({
         </code>
         <br />
         <code>
-          <b>items in view</b>:{" "}
-          {[...inViewItemEls].map((x) => x.dataset.title).join(", ")}
+          <b>items in view</b>: {inViewItems.map((x) => x?.title).join(", ")}
         </code>
         <br />
         <code>
-          <b>focus item</b>: {focusItemEl?.dataset.title}
+          <b>focus item</b>: {focusItem?.title}
         </code>
       </div>
     );
   },
 
   Item: ({ id, title, text }: Item) => {
-    const { ref, isFocus, focus } = useStore((x) => x.useItem());
+    const { ref, isFocus, focus } = useStore((x) => x.useItem(id));
 
     return (
       <div
@@ -66,8 +74,6 @@ const Sub = createSub({
           paddingInline: 8,
           cursor: "pointer",
         }}
-        data-id={id}
-        data-title={title}
         onClick={focus}
       >
         <div style={{ opacity: isFocus ? 1 : 0.4 }}>
@@ -110,11 +116,11 @@ const Sub = createSub({
   },
 
   FocusItem: () => {
-    const focusItemEl = useStore((x) => x.focusItemEl);
+    const focusItemKey = useStore((x) => x.focusItemKey);
 
     const focusItem = useMemo(() => {
-      return items.find((x) => x.id == focusItemEl?.dataset?.id);
-    }, [focusItemEl]);
+      return getItemByKey(focusItemKey);
+    }, [focusItemKey]);
 
     return (
       focusItem && (

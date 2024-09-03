@@ -10,6 +10,7 @@ import {
 import { create, StoreApi, UseBoundStore } from "zustand";
 
 type ScrollingDirection = "upward" | "downward";
+type ItemKey = string | number;
 
 export const targetDataKey = "data-observer-target";
 
@@ -20,15 +21,18 @@ type StoreFields = {
   setScrollContainerObserver: (obeserver: IntersectionObserver | null) => void;
   scrollingDirection: ScrollingDirection | null;
   setScrollingDirection: (scrollingDirection?: ScrollingDirection) => void;
+  itemElKeyMap: WeakMap<HTMLElement, ItemKey>;
   inViewItemEls: Set<HTMLElement>;
+  inViewItemKeys: Set<ItemKey>;
   setInViewItemEls: (
     inViewEls: HTMLElement[],
     notInViewEls: HTMLElement[]
   ) => void;
   focusItemEl: HTMLElement | null;
+  focusItemKey: ItemKey | null;
   setFocusItemEl: (itemEl: HTMLElement | null) => void;
   updateFocus: () => void;
-  useItem: () => {
+  useItem: (key: ItemKey) => {
     ref: any;
     isFocus: boolean;
     focus: () => void;
@@ -54,26 +58,45 @@ const store = create<StoreFields>((set, get, api) => {
     setScrollingDirection(scrollingDirection) {
       set({ scrollingDirection: scrollingDirection ?? null });
     },
+    itemElKeyMap: new WeakMap(),
     inViewItemEls: new Set(),
+    inViewItemKeys: new Set(),
     setInViewItemEls(inViewEls, notInViewEls) {
-      const { inViewItemEls: current } = get();
+      const { inViewItemEls: current, itemElKeyMap } = get();
 
       inViewEls.forEach((x) => current.add(x));
       notInViewEls.forEach((x) => current.delete(x));
 
-      set({ inViewItemEls: new Set(current) });
+      const nextInViewItemEls = new Set(current),
+        nextInViewItemKeys = new Set(
+          [...nextInViewItemEls].map((x) => itemElKeyMap.get(x) ?? null)
+        );
+
+      nextInViewItemKeys.delete(null);
+
+      set({
+        inViewItemEls: new Set(current),
+        inViewItemKeys: nextInViewItemKeys as any,
+      });
     },
 
     focusItemEl: null,
+    focusItemKey: null,
     setFocusItemEl(focusEl) {
-      set({ focusItemEl: focusEl });
+      const { itemElKeyMap } = get();
+
+      set({
+        focusItemEl: focusEl,
+        focusItemKey: itemElKeyMap.get(focusEl!) ?? null,
+      });
     },
     updateFocus() {
       const {
-        inViewItemEls: inViewItemEls,
-        scrollContainer: scrollContainer,
+        inViewItemEls,
+        scrollContainer,
         scrollingDirection,
-        focusItemEl: focusItemEl,
+        focusItemEl,
+        itemElKeyMap,
       } = get();
 
       if (inViewItemEls.has(focusItemEl!)) return;
@@ -88,19 +111,26 @@ const store = create<StoreFields>((set, get, api) => {
       }
 
       const nextFocusItemEl = (targets.find((x) =>
-        inViewItemEls.has(x as any)
-      ) ?? null) as any;
-      set({ focusItemEl: nextFocusItemEl });
+          inViewItemEls.has(x as any)
+        ) ?? null) as any,
+        nextFocusItemKey = itemElKeyMap.get(nextFocusItemEl) ?? null;
+
+      set({ focusItemEl: nextFocusItemEl, focusItemKey: nextFocusItemKey });
     },
 
-    useItem() {
+    useItem(key) {
       const ref = useRef<HTMLElement>();
-      const [focusItemEl, setFocusItemEl, scrollContainerObserver] =
-        useStoreContext()((x) => [
-          x.focusItemEl,
-          x.setFocusItemEl,
-          x.scrollContainerObserver,
-        ]);
+      const [
+        focusItemEl,
+        setFocusItemEl,
+        scrollContainerObserver,
+        itemElKeyMap,
+      ] = useStoreContext()((x) => [
+        x.focusItemEl,
+        x.setFocusItemEl,
+        x.scrollContainerObserver,
+        x.itemElKeyMap,
+      ]);
 
       useEffect(() => {
         if (ref.current && scrollContainerObserver) {
@@ -108,6 +138,19 @@ const store = create<StoreFields>((set, get, api) => {
           scrollContainerObserver?.observe(ref.current);
         }
       }, [scrollContainerObserver]);
+
+      useEffect(() => {
+        if (!["string", "number"].includes(typeof key)) {
+          console.error(
+            `[useItem] item key should be string or number. Please check.`
+          );
+          return;
+        }
+
+        if (ref.current) {
+          itemElKeyMap.set(ref.current, key);
+        }
+      }, [key]);
 
       const isFocus = focusItemEl === ref.current;
 
