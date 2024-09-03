@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useReducer } from "react";
 import { createSub } from "@lib-react/utils/createSub";
 import { StoreProvider, targetDataKey, useStore } from "./store";
 
@@ -8,23 +8,21 @@ type Item = {
   text: string;
 };
 
-const items = new Array(20).fill(null).map(
-  (_, idx) =>
-    ({
-      id: idx as any,
-      title: `Item ${idx + 1}`,
-      text: [
-        idx % 4 >= 0 &&
-          "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
-        idx % 4 >= 1 && "Minus quidem,",
-        idx % 4 >= 2 &&
-          "reprehenderit aliquid iure esse quibusdam perspiciatis modi doloremque nobis at voluptatem repellat dignissimos nihil enim aspernatur eos?",
-        idx % 4 >= 3 && "Fuga, accusantium incidunt.",
-      ]
-        .filter(Boolean)
-        .join(" "),
-    }) as Item
-);
+const createItem = (idx: number) => ({
+  id: idx as any,
+  title: `Item ${idx + 1}`,
+  text: [
+    idx % 4 >= 0 && "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
+    idx % 4 >= 1 && "Minus quidem,",
+    idx % 4 >= 2 &&
+      "reprehenderit aliquid iure esse quibusdam perspiciatis modi doloremque nobis at voluptatem repellat dignissimos nihil enim aspernatur eos?",
+    idx % 4 >= 3 && "Fuga, accusantium incidunt.",
+  ]
+    .filter(Boolean)
+    .join(" "),
+});
+
+let items = new Array(20).fill(null).map((_, idx) => createItem(idx));
 
 const Sub = createSub({
   Status: () => {
@@ -81,6 +79,12 @@ const Sub = createSub({
 
   Items: () => {
     const scrollRef = useStore((x) => x.scrollRef);
+    const [, update] = useReducer((x) => x + 1, 0);
+
+    const addItem = useCallback(() => {
+      items[items.length] = createItem(items.length);
+      update();
+    }, []);
 
     return (
       <div
@@ -95,6 +99,9 @@ const Sub = createSub({
         {items.map((x) => {
           return <Sub.Item key={x.id} {...x} />;
         })}
+        <div>
+          <button onClick={addItem}>Add an item</button>
+        </div>
         <div style={{ height: "100%" }} />
       </div>
     );
