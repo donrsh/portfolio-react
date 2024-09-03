@@ -29,7 +29,7 @@ const Sub = createSub({
     const [scrollingDirection, inViewEls, focusEl] = useStore((x) => [
       x.scrollingDirection,
       x.inViewEls,
-      x.getFocusEl(),
+      x.focusEl
     ]);
 
     return (
@@ -108,7 +108,7 @@ const Sub = createSub({
   },
 
   FocusItem: () => {
-    const focusEl = useStore((x) => x.getFocusEl());
+    const focusEl = useStore((x) => x.focusEl);
 
     const focusItem = useMemo(() => {
       return items.find((x) => x.id == focusEl?.dataset?.id);
