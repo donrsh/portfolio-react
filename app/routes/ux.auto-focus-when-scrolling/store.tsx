@@ -12,7 +12,7 @@ import { create, StoreApi, UseBoundStore } from "zustand";
 type ScrollingDirection = "upward" | "downward";
 type ItemKey = string | number;
 
-export const targetDataKey = "data-observer-target";
+const itemDataKey = "data-auto-focus-item-when-scrolling";
 
 type StoreFields = {
   scrollContainer: HTMLElement | null;
@@ -102,8 +102,7 @@ const store = create<StoreFields>((set, get, api) => {
       if (inViewItemEls.has(focusItemEl!)) return;
 
       let targets = [
-        ...(scrollContainer?.querySelectorAll(`[${targetDataKey}='true']`) ??
-          []),
+        ...(scrollContainer?.querySelectorAll(`[${itemDataKey}]`) ?? []),
       ];
 
       if (scrollingDirection === "upward") {
@@ -134,7 +133,7 @@ const store = create<StoreFields>((set, get, api) => {
 
       useEffect(() => {
         if (ref.current && scrollContainerObserver) {
-          ref.current.setAttribute(targetDataKey, "true");
+          ref.current.setAttribute(itemDataKey, "");
           scrollContainerObserver?.observe(ref.current);
         }
       }, [scrollContainerObserver]);
