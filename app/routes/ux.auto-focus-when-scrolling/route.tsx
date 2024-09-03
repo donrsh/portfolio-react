@@ -29,7 +29,7 @@ const Sub = createSub({
     const [scrollingDirection, inViewEls, focusEl] = useStore((x) => [
       x.scrollingDirection,
       x.inViewEls,
-      x.focusEl
+      x.focusEl,
     ]);
 
     return (
@@ -56,7 +56,7 @@ const Sub = createSub({
   },
 
   Item: ({ id, title, text }: Item) => {
-    const { ref, isFocus } = useStore((x) => x.useTarget());
+    const { ref, isFocus, focus } = useStore((x) => x.useTarget());
 
     return (
       <div
@@ -64,9 +64,11 @@ const Sub = createSub({
         style={{
           borderBottom: "1px solid gray",
           paddingInline: 8,
+          cursor: "pointer",
         }}
         data-id={id}
         data-title={title}
+        onClick={focus}
       >
         <div style={{ opacity: isFocus ? 1 : 0.4 }}>
           <p>

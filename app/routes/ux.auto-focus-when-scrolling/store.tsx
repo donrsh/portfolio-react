@@ -1,6 +1,7 @@
 import {
   createContext,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -22,10 +23,12 @@ type StoreFields = {
   inViewEls: Set<HTMLElement>;
   setInViewEls: (inViewEls: HTMLElement[], notInViewEls: HTMLElement[]) => void;
   focusEl: HTMLElement | null;
+  setFocusEl: (focusEl: HTMLElement | null) => void;
   updateFocusEl: () => void;
   useTarget: () => {
     ref: any;
     isFocus: boolean;
+    focus: () => void;
   };
 };
 
@@ -59,6 +62,9 @@ const store = create<StoreFields>((set, get, api) => {
     },
 
     focusEl: null,
+    setFocusEl(focusEl) {
+      set({ focusEl });
+    },
     updateFocusEl() {
       const { inViewEls, scrollEl, scrollingDirection, focusEl } = get();
 
@@ -79,8 +85,9 @@ const store = create<StoreFields>((set, get, api) => {
 
     useTarget() {
       const ref = useRef<HTMLElement>();
-      const [focusEl, scrollElObserver] = useStoreContext()((x) => [
+      const [focusEl, setFocusEl, scrollElObserver] = useStoreContext()((x) => [
         x.focusEl,
+        x.setFocusEl,
         x.scrollElObserver,
       ]);
 
@@ -94,10 +101,15 @@ const store = create<StoreFields>((set, get, api) => {
 
       const isFocus = focusEl === ref.current;
 
+      const focus = useCallback(() => {
+        setFocusEl(ref.current!);
+      }, [setFocusEl]);
+
       return useMemo(
         () => ({
           ref,
           isFocus,
+          focus,
         }),
         [ref, isFocus]
       );
