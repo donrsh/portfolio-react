@@ -86,7 +86,7 @@ const Sub = createSub({
   },
 
   Items: () => {
-    const scrollRef = useStore((x) => x.scrollContainerRef);
+    const scrollContainerRef = useStore((x) => x.scrollContainerRef);
     const [, update] = useReducer((x) => x + 1, 0);
 
     const addItem = useCallback(() => {
@@ -96,7 +96,7 @@ const Sub = createSub({
 
     return (
       <div
-        ref={scrollRef as any}
+        ref={scrollContainerRef as any}
         style={{
           background: "lightgray",
           height: "100%",
