@@ -8,7 +8,9 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { create, StoreApi, UseBoundStore } from "zustand";
+import { StoreApi, UseBoundStore } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
+import { shallow } from "zustand/shallow";
 
 type ScrollingDirection = "upward" | "downward";
 type ItemKey = string | number;
@@ -42,7 +44,7 @@ type Store = UseBoundStore<StoreApi<StoreFields>>;
 const StoreContext = createContext<Store>(null as any);
 const useStoreContext = () => useContext(StoreContext);
 
-const store = create<StoreFields>((set, get, api) => {
+const store = createWithEqualityFn<StoreFields>((set, get, api) => {
   return {
     set,
     scrollContainer: null,
@@ -148,7 +150,7 @@ const store = create<StoreFields>((set, get, api) => {
       );
     },
   };
-});
+}, shallow);
 
 export const useStore = store;
 
