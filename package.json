@@ -1,5 +1,5 @@
 {
-  "name": "template-remix-spa",
+  "name": "portfolio-react",
   "packageManager": "pnpm@9.1.1",
   "private": true,
   "sideEffects": false,
