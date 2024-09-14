@@ -1,0 +1,1 @@
+import{r as n}from"./jsx-runtime-JVR6BLX4.js";function s(){const r=n.useRef(null);return n.useEffect(()=>{const e=r.current;if(e){const l=t=>{t.deltaY!==0&&(t.preventDefault(),e.scrollTo({left:e.scrollLeft+t.deltaY}))};return e.addEventListener("wheel",l),()=>e.removeEventListener("wheel",l)}},[]),r}export{s as u};
