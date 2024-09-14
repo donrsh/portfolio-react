@@ -20,14 +20,13 @@ export default function Page() {
     <>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {animals.map((animal) => (
-          <>
-            <button
-              onClick={() => animalPopover.openWithData(animal)}
-              style={{ width: "fit-content" }}
-            >
-              {animal.name}
-            </button>
-          </>
+          <button
+            key={animal.name}
+            onClick={() => animalPopover.openWithData(animal)}
+            style={{ width: "fit-content" }}
+          >
+            {animal.name}
+          </button>
         ))}
       </div>
 
