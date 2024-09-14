@@ -55,6 +55,11 @@ export default function Index() {
             react hook: <code>useAnimateOnUpdate</code>
           </Link>
         </li>
+        <li>
+          <Link to="/demo/useHorizontalScroll">
+            react hook: <code>useHorizontalScroll</code>
+          </Link>
+        </li>
       </ul>
 
       <h2>Applets</h2>
