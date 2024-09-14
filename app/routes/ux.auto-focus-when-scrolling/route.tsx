@@ -45,9 +45,9 @@ const Sub = createSub({
       <div style={{ marginBottom: 20 }}>
         <code>
           <b>scrolling direction</b>:{" "}
-          {scrollingDirection === "downward"
+          {scrollingDirection === "forward"
             ? "⬇️"
-            : scrollingDirection === "upward"
+            : scrollingDirection === "backward"
               ? "⬆️"
               : "null"}
         </code>

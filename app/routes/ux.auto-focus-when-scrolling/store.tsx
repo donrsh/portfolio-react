@@ -12,7 +12,7 @@ import { StoreApi, UseBoundStore } from "zustand";
 import { createWithEqualityFn } from "zustand/traditional";
 import { shallow } from "zustand/shallow";
 
-type ScrollingDirection = "upward" | "downward";
+type ScrollingDirection = "backward" | "forward";
 type ItemKey = string | number;
 
 const itemDataKey = "data-auto-focus-item-when-scrolling";
@@ -92,7 +92,7 @@ const store = createWithEqualityFn<StoreFields>((set, get, api) => {
         ...(scrollContainer?.querySelectorAll(`[${itemDataKey}]`) ?? []),
       ];
 
-      if (scrollingDirection === "upward") {
+      if (scrollingDirection === "backward") {
         targets.reverse();
       }
 
@@ -188,7 +188,7 @@ export const StoreProvider = ({ children }: PropsWithChildren) => {
     if (!scrollContainer) return;
 
     const handler = (e: WheelEvent) => {
-      const scrollingDirection = e.deltaY > 0 ? "downward" : "upward";
+      const scrollingDirection = e.deltaY > 0 ? "forward" : "backward";
       set({ scrollingDirection });
       updateFocus();
     };
