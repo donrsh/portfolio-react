@@ -137,7 +137,7 @@ const store = createWithEqualityFn<StoreFields>((set, get, api) => {
       const isFocus = focusItemEl === ref.current;
 
       const focus = useCallback(() => {
-        set({ focusItemEl: ref.current! });
+        set({ focusItemEl: ref.current!, focusItemKey: key });
       }, [set]);
 
       return useMemo(
