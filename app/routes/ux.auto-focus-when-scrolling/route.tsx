@@ -1,6 +1,11 @@
-import React, { useCallback, useMemo, useReducer } from "react";
+import React, { useCallback, useMemo, useReducer, useState } from "react";
 import { createSub } from "@lib-react/utils/createSub";
-import { StoreProvider, useStore } from "./store";
+import {
+  AutoFocusWhenScrollingProvider,
+  ScrollerDirection,
+  useAutoFocusWhenScrollingStore,
+} from "./store";
+import useHorizontalScroll from "@lib-react/hooks/useHorizontalScroll";
 
 type Item = {
   id: any;
@@ -25,13 +30,30 @@ const createItem = (idx: number) => ({
 let items = new Array(20).fill(null).map((_, idx) => createItem(idx));
 const getItemByKey = (key: any) => items.find((x) => x.id === key) ?? null;
 
+const useMergeRefs = (...refs: any[]) => {
+  return useMemo(() => {
+    return (el: HTMLElement) => {
+      refs.forEach((x) => {
+        if (typeof x === "function") {
+          x(el);
+        }
+
+        if (typeof x === "object" && x !== null) {
+          x.current = el;
+        }
+      });
+    };
+  }, [refs]);
+};
+
 const Sub = createSub({
   Status: () => {
-    const [scrollingDirection, inViewItemKeys, focusItemKey] = useStore((x) => [
-      x.scrollingDirection,
-      x.inViewItemKeys,
-      x.focusItemKey,
-    ]);
+    const [scrollingDirection, inViewItemKeys, focusItemKey] =
+      useAutoFocusWhenScrollingStore((x) => [
+        x.scrollingDirection,
+        x.inViewItemKeys,
+        x.focusItemKey,
+      ]);
 
     const inViewItems = useMemo(() => {
       return inViewItemKeys ? [...inViewItemKeys].map(getItemByKey) : [];
@@ -44,12 +66,7 @@ const Sub = createSub({
     return (
       <div style={{ marginBottom: 20 }}>
         <code>
-          <b>scrolling direction</b>:{" "}
-          {scrollingDirection === "downward"
-            ? "⬇️"
-            : scrollingDirection === "upward"
-              ? "⬆️"
-              : "null"}
+          <b>scrolling direction</b>: <code>{scrollingDirection}</code>
         </code>
         <br />
         <code>
@@ -64,7 +81,9 @@ const Sub = createSub({
   },
 
   Item: ({ id, title, text }: Item) => {
-    const { ref, isFocus, focus } = useStore((x) => x.useItem(id));
+    const { ref, isFocus, focus } = useAutoFocusWhenScrollingStore((x) =>
+      x.useItem(id)
+    );
 
     return (
       <div
@@ -73,6 +92,8 @@ const Sub = createSub({
           borderBottom: "1px solid gray",
           paddingInline: 8,
           cursor: "pointer",
+          width: "100px",
+          flexShrink: 0,
         }}
         onClick={focus}
       >
@@ -85,9 +106,17 @@ const Sub = createSub({
     );
   },
 
-  Items: () => {
-    const scrollContainerRef = useStore((x) => x.scrollContainerRef);
+  Items: ({ scrollerDirection }: { scrollerDirection: ScrollerDirection }) => {
+    const scrollContainerRef = useAutoFocusWhenScrollingStore(
+      (x) => x.scrollContainerRef
+    );
+    const horizontalScrollRef = useHorizontalScroll();
     const [, update] = useReducer((x) => x + 1, 0);
+
+    const ref = useMergeRefs(
+      scrollContainerRef,
+      scrollerDirection === "horizontal" ? horizontalScrollRef : null
+    );
 
     const addItem = useCallback(() => {
       items[items.length] = createItem(items.length);
@@ -96,19 +125,29 @@ const Sub = createSub({
 
     return (
       <div
-        ref={scrollContainerRef as any}
+        ref={ref as any}
         style={{
+          height: scrollerDirection === "vertical" ? "100%" : "fit-content",
           background: "lightgray",
-          height: "100%",
           overflow: "auto",
-          flex: "0 0 150px",
+          flex: "none",
+          display: "flex",
+          flexDirection: scrollerDirection === "horizontal" ? "row" : "column",
         }}
       >
         {items.map((x) => {
           return <Sub.Item key={x.id} {...x} />;
         })}
-        <div>
-          <button onClick={addItem}>Add an item</button>
+        <div
+          style={{
+            position: "sticky",
+            [scrollerDirection === "horizontal" ? "right" : "bottom"]: 0,
+          }}
+        >
+          <button
+            style={{ width: 100 }}
+            onClick={addItem}
+          >{`Add an item`}</button>
         </div>
         <div style={{ height: "100%" }} />
       </div>
@@ -116,7 +155,7 @@ const Sub = createSub({
   },
 
   FocusItem: () => {
-    const focusItemKey = useStore((x) => x.focusItemKey);
+    const focusItemKey = useAutoFocusWhenScrollingStore((x) => x.focusItemKey);
 
     const focusItem = useMemo(() => {
       return getItemByKey(focusItemKey);
@@ -138,22 +177,48 @@ const Sub = createSub({
 });
 
 export default function Page() {
+  const [scrollerDirection, setScrollerDirection] =
+    useState<ScrollerDirection>("vertical");
+
   return (
-    <StoreProvider>
+    <>
       <h1>Auto Focus when Scrolling</h1>
-      <Sub.Status />
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          gap: 20,
-          height: 300,
-          border: "1px solid gray",
-        }}
-      >
-        <Sub.Items />
-        <Sub.FocusItem />
+      <div>
+        <b>Scroller Direction</b>
+        {(["vertical", "horizontal"] as ScrollerDirection[]).map((x) => (
+          <label key={x}>
+            <input
+              type="radio"
+              name="scrollerDirection"
+              value={x}
+              onChange={() => setScrollerDirection(x)}
+              checked={scrollerDirection === x}
+            />
+            {x}
+          </label>
+        ))}
       </div>
-    </StoreProvider>
+      <hr />
+      <AutoFocusWhenScrollingProvider
+        key={scrollerDirection}
+        {...{ scrollerDirection }}
+      >
+        <Sub.Status />
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection:
+              scrollerDirection === "horizontal" ? "column" : "row",
+            gap: 20,
+            height: 300,
+            border: "1px solid gray",
+          }}
+        >
+          <Sub.Items {...{ scrollerDirection }} />
+          <Sub.FocusItem />
+        </div>
+      </AutoFocusWhenScrollingProvider>
+    </>
   );
 }
