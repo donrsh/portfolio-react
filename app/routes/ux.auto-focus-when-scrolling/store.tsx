@@ -7,11 +7,13 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { StoreApi, UseBoundStore } from "zustand";
 import { createWithEqualityFn } from "zustand/traditional";
 import { shallow } from "zustand/shallow";
 
+export type ScrollerDirection = "vertical" | "horizontal";
 type ScrollingDirection = "backward" | "forward";
 type ItemKey = string | number;
 
@@ -43,118 +45,130 @@ type Store = UseBoundStore<StoreApi<StoreFields>>;
 
 const StoreContext = createContext<Store>(null as any);
 const useStoreContext = () => useContext(StoreContext);
+const useStore: Store = ((...args: any[]) =>
+  useStoreContext()(
+    // @ts-ignore
+    ...args
+  )) as any;
 
-const store = createWithEqualityFn<StoreFields>((set, get, api) => {
-  return {
-    set,
-    scrollContainer: null,
-    scrollContainerRef(el) {
-      set({ scrollContainer: el });
-    },
-    scrollContainerObserver: null,
-    scrollingDirection: null,
-    itemElKeyMap: new WeakMap(),
-    inViewItemEls: new Set(),
-    inViewItemKeys: new Set(),
-    setInViewItemEls(inViewEls, notInViewEls) {
-      const { inViewItemEls: current, itemElKeyMap } = get();
+const createStore = (scrollerDirection: ScrollerDirection) => {
+  const store = createWithEqualityFn<StoreFields>((set, get, api) => {
+    return {
+      set,
+      scrollContainer: null,
+      scrollContainerRef(el) {
+        set({ scrollContainer: el });
+      },
+      scrollContainerObserver: null,
+      scrollingDirection: null,
+      itemElKeyMap: new WeakMap(),
+      inViewItemEls: new Set(),
+      inViewItemKeys: new Set(),
+      setInViewItemEls(inViewEls, notInViewEls) {
+        const { inViewItemEls: current, itemElKeyMap } = get();
 
-      inViewEls.forEach((x) => current.add(x));
-      notInViewEls.forEach((x) => current.delete(x));
+        inViewEls.forEach((x) => current.add(x));
+        notInViewEls.forEach((x) => current.delete(x));
 
-      const nextInViewItemEls = new Set(current),
-        nextInViewItemKeys = new Set(
-          [...nextInViewItemEls].map((x) => itemElKeyMap.get(x) ?? null)
-        );
-
-      nextInViewItemKeys.delete(null);
-
-      set({
-        inViewItemEls: new Set(current),
-        inViewItemKeys: nextInViewItemKeys as any,
-      });
-    },
-
-    focusItemEl: null,
-    focusItemKey: null,
-    updateFocus() {
-      const {
-        inViewItemEls,
-        scrollContainer,
-        scrollingDirection,
-        focusItemEl,
-        itemElKeyMap,
-      } = get();
-
-      if (inViewItemEls.has(focusItemEl!)) return;
-
-      let targets = [
-        ...(scrollContainer?.querySelectorAll(`[${itemDataKey}]`) ?? []),
-      ];
-
-      if (scrollingDirection === "backward") {
-        targets.reverse();
-      }
-
-      const nextFocusItemEl = (targets.find((x) =>
-          inViewItemEls.has(x as any)
-        ) ?? null) as any,
-        nextFocusItemKey = itemElKeyMap.get(nextFocusItemEl) ?? null;
-
-      set({ focusItemEl: nextFocusItemEl, focusItemKey: nextFocusItemKey });
-    },
-
-    useItem(key) {
-      const ref = useRef<HTMLElement>();
-      const [focusItemEl, set, scrollContainerObserver, itemElKeyMap] =
-        useStoreContext()((x) => [
-          x.focusItemEl,
-          x.set,
-          x.scrollContainerObserver,
-          x.itemElKeyMap,
-        ]);
-
-      useEffect(() => {
-        if (ref.current && scrollContainerObserver) {
-          ref.current.setAttribute(itemDataKey, "");
-          scrollContainerObserver?.observe(ref.current);
-        }
-      }, [scrollContainerObserver]);
-
-      useEffect(() => {
-        if (!["string", "number"].includes(typeof key)) {
-          console.error(
-            `[useItem] item key should be string or number. Please check.`
+        const nextInViewItemEls = new Set(current),
+          nextInViewItemKeys = new Set(
+            [...nextInViewItemEls].map((x) => itemElKeyMap.get(x) ?? null)
           );
-          return;
+
+        nextInViewItemKeys.delete(null);
+
+        set({
+          inViewItemEls: new Set(current),
+          inViewItemKeys: nextInViewItemKeys as any,
+        });
+      },
+
+      focusItemEl: null,
+      focusItemKey: null,
+      updateFocus() {
+        const {
+          inViewItemEls,
+          scrollContainer,
+          scrollingDirection,
+          focusItemEl,
+          itemElKeyMap,
+        } = get();
+
+        if (inViewItemEls.has(focusItemEl!)) return;
+
+        let targets = [
+          ...(scrollContainer?.querySelectorAll(`[${itemDataKey}]`) ?? []),
+        ];
+
+        if (scrollingDirection === "backward") {
+          targets.reverse();
         }
 
-        if (ref.current) {
-          itemElKeyMap.set(ref.current, key);
-        }
-      }, [key]);
+        const nextFocusItemEl = (targets.find((x) =>
+            inViewItemEls.has(x as any)
+          ) ?? null) as any,
+          nextFocusItemKey = itemElKeyMap.get(nextFocusItemEl) ?? null;
 
-      const isFocus = focusItemEl === ref.current;
+        set({ focusItemEl: nextFocusItemEl, focusItemKey: nextFocusItemKey });
+      },
 
-      const focus = useCallback(() => {
-        set({ focusItemEl: ref.current!, focusItemKey: key });
-      }, [set]);
+      useItem(key) {
+        const ref = useRef<HTMLElement>();
+        const [focusItemEl, set, scrollContainerObserver, itemElKeyMap] =
+          useStoreContext()((x) => [
+            x.focusItemEl,
+            x.set,
+            x.scrollContainerObserver,
+            x.itemElKeyMap,
+          ]);
 
-      return useMemo(
-        () => ({
-          ref,
-          isFocus,
-          focus,
-        }),
-        [ref, isFocus]
-      );
-    },
-  };
-}, shallow);
+        useEffect(() => {
+          if (ref.current && scrollContainerObserver) {
+            ref.current.setAttribute(itemDataKey, "");
+            scrollContainerObserver?.observe(ref.current);
+          }
+        }, [scrollContainerObserver]);
 
-export const useStore = store;
+        useEffect(() => {
+          if (!["string", "number"].includes(typeof key)) {
+            console.error(
+              `[useItem] item key should be string or number. Please check.`
+            );
+            return;
+          }
 
-export const StoreProvider = ({ children }: PropsWithChildren) => {
+          if (ref.current) {
+            itemElKeyMap.set(ref.current, key);
+          }
+        }, [key]);
+
+        const isFocus = focusItemEl === ref.current;
+
+        const focus = useCallback(() => {
+          set({ focusItemEl: ref.current!, focusItemKey: key });
+        }, [set]);
+
+        return useMemo(
+          () => ({
+            ref,
+            isFocus,
+            focus,
+          }),
+          [ref, isFocus]
+        );
+      },
+    };
+  }, shallow);
+
+  return store;
+};
+
+const Provider = ({
+  children,
+  scrollerDirection,
+}: PropsWithChildren<{ scrollerDirection: ScrollerDirection }>) => {
+  const [useStore] = useState(() => createStore(scrollerDirection));
+
   const [scrollContainer, setInViewItemEls, updateFocus, set] = useStore(
     (x) => [x.scrollContainer, x.setInViewItemEls, x.updateFocus, x.set]
   );
@@ -188,16 +202,23 @@ export const StoreProvider = ({ children }: PropsWithChildren) => {
     if (!scrollContainer) return;
 
     const handler = (e: WheelEvent) => {
-      const scrollingDirection = e.deltaY > 0 ? "forward" : "backward";
+      const delta = scrollerDirection === "horizontal" ? -e.deltaX : e.deltaY;
+      const scrollingDirection = delta >= 0 ? "forward" : "backward";
+
       set({ scrollingDirection });
       updateFocus();
     };
 
     scrollContainer.addEventListener("wheel", handler);
     return () => scrollContainer.removeEventListener("wheel", handler);
-  }, [scrollContainer, set, updateFocus]);
+  }, [scrollContainer, set, updateFocus, scrollerDirection]);
 
   return (
-    <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
+    <StoreContext.Provider value={useStore}>{children}</StoreContext.Provider>
   );
+};
+
+export {
+  Provider as AutoFocusWhenScrollingProvider,
+  useStore as useAutoFocusWhenScrollingStore,
 };
