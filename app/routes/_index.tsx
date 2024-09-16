@@ -17,7 +17,6 @@ const ExternalLink = (props: ComponentProps<"a">) => {
 export default function Index() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>React Portfolio</h1>
       <p>
         This site serves as a portfolio of my{" "}
         <ExternalLink href="https://react.dev/">React</ExternalLink> skill.
