@@ -9,32 +9,18 @@ export default function Page() {
   return (
     <>
       <div>
-        <p>Use your mouse wheel to scroll horizontally</p>
+        <p>Scroll vertically and observe the container scrolls horizontally.</p>
 
         <div
           ref={scrollRef}
-          style={{
-            display: "flex",
-            overflowX: "auto",
-            whiteSpace: "nowrap",
-            padding: "20px 0",
-            maxWidth: "100%",
-          }}
+          className="flex overflow-x-auto whitespace-nowrap py-4 max-w-full"
         >
           {[...Array(20)].map((_, index) => (
             <div
               key={index}
+              className="flex-none w-40 h-40 m-2 flex items-center justify-center text-white text-2xl first:ml-0 last:mr-0"
               style={{
-                flex: "0 0 auto",
-                width: "200px",
-                height: "200px",
-                margin: "0 10px",
                 backgroundColor: `hsl(${index * 20}, 70%, 60%)`,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                fontSize: "24px",
-                color: "white",
               }}
             >
               Item {index + 1}
@@ -44,11 +30,7 @@ export default function Page() {
       </div>
       <hr />
 
-      <SourceCodeRefs
-        open
-        data={sourceCodeReferences}
-        style={{ marginBlock: 16 }}
-      />
+      <SourceCodeRefs open data={sourceCodeReferences} />
     </>
   );
 }
