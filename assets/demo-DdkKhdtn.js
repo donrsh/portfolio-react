@@ -1,0 +1,1 @@
+import{j as s}from"./jsx-runtime-JVR6BLX4.js";import{O as t}from"./index-3XVkSrjk.js";function a(){return s.jsx(s.Fragment,{children:s.jsx("div",{className:"p-4 -mt-4",children:s.jsx("div",{className:"py-2",children:s.jsx(t,{})})})})}export{a as default};
