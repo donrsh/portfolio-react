@@ -10,9 +10,16 @@ import {
 } from "react";
 import SwipeListener from "swipe-listener";
 import { getEmojiCache, cacheEmojiUse } from "./cache";
-import "./styles.css";
 import emojiFavicon from "./emoji-favicon.png";
 import whyYouNeedThisApp_Image from "./images/Why-you-need-an-app-for-full-screen-emoji.png";
+import { Input } from "~/lib/ui/input";
+import { Button } from "~/lib/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "~/lib/ui/dialog";
 
 const Sub = createSub({
   WhatIsThisAppFor: () => {
@@ -28,34 +35,40 @@ const Sub = createSub({
     );
 
     return (
-      <div style={{ marginBlock: 16 }}>
-        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <a href="#" style={{ fontStyle: "oblique" }} onClick={onClick}>
-          What is this for?
-        </a>
-
-        <dialog open={dialog.isOpen} onClose={dialog.close}>
-          <img
-            src={whyYouNeedThisApp_Image}
-            alt=""
-            style={{ width: "100%", maxWidth: 500 }}
-          />
-          <div className="row-vcenter" style={{ gap: 8 }}>
-            <span>Source</span>
-            <a
-              href="https://www.youtube.com/watch?v=TfNnpsYATbQ"
-              target="_blank"
-              rel="noreferrer"
-              style={{ flex: 1 }}
-            >
-              TBBT S10E14: The Emotion Detection Automation
-            </a>
-            <button onClick={dialog.close} style={{ marginLeft: "auto" }}>
-              OK
-            </button>
+      <Dialog
+        open={dialog.isOpen}
+        onOpenChange={(open) => {
+          !open && dialog.close();
+        }}
+      >
+        <DialogTrigger asChild>
+          <Button variant="link" onClick={onClick as any} className="mb-4">
+            What is this for?
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogTitle></DialogTitle>
+          <div className="mt-4">
+            <img
+              src={whyYouNeedThisApp_Image}
+              alt=""
+              style={{ width: "100%", maxWidth: 500 }}
+            />
+            <div className="flex items-center gap-2">
+              <Button variant="link" asChild>
+                <a
+                  href="https://www.youtube.com/watch?v=TfNnpsYATbQ"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ flex: 1 }}
+                >
+                  TBBT S10E14: The Emotion Detection Automation
+                </a>
+              </Button>
+            </div>
           </div>
-        </dialog>
-      </div>
+        </DialogContent>
+      </Dialog>
     );
   },
 
@@ -72,8 +85,12 @@ const Sub = createSub({
     }, [onClose]);
 
     return (
-      <div ref={ref} className="dialog center" style={{}}>
-        <div className="emoji">{emoji}</div>
+      <div
+        ref={ref}
+        className="z-1 fixed top-0 left-0 w-screen h-screen flex items-center justify-center
+        bg-white dark:bg-black"
+      >
+        <div className="text-[256px]">{emoji}</div>
       </div>
     );
   },
@@ -157,40 +174,41 @@ export default function Page() {
   }, []);
 
   return (
-    <>
+    <div className="px-4">
+      <Sub.WhatIsThisAppFor />
+
       {isDialogOpen && <Sub.EmojiDialog emoji={emoji!} onClose={closeDialog} />}
       <div>
         <form {...{ onSubmit }}>
-          <label className="row-vcenter" style={{ gap: 8, width: "100%" }}>
-            <span style={{ flex: 0 }}>Emoji</span>
-            <input
-              name="emoji"
-              {...{ onKeyUp }}
-              style={{ flex: 1, minWidth: 120, fontSize: 20 }}
-            />
-            <button type="submit" style={{ flex: 0, paddingBlock: 4 }}>
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2">
+              <span style={{ flex: 0 }}>Emoji</span>
+              <Input name="emoji" {...{ onKeyUp }} />
+            </label>
+            <Button type="submit" size="sm">
               Show!
-            </button>
-          </label>
+            </Button>
+          </div>
         </form>
 
-        <Sub.WhatIsThisAppFor />
-
-        <div className="shortcut-buttons">
+        <div className="flex items-center flex-wrap gap-2 mt-4">
+          Shortcuts
           {getEmojiCache().map((x) => {
             return (
-              <button
+              <Button
                 data-emoji={x.emoji}
                 key={x.emoji}
                 onClick={onShortcutButtonClick}
-                style={{ fontSize: 20 }}
+                variant="outline"
+                size="icon"
+                className="text-xl"
               >
                 {x.emoji}
-              </button>
+              </Button>
             );
           })}
         </div>
       </div>
-    </>
+    </div>
   );
 }
