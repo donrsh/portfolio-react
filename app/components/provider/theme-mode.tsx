@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type ThemeMode = "dark" | "light" | "system";
+type ThemeMode = "dark" | "light";
 
 type ThemeModeProviderProps = {
   children: React.ReactNode;
@@ -11,11 +11,24 @@ type ThemeModeProviderProps = {
 type ThemeModeProviderState = {
   themeMode: ThemeMode;
   setThemeMode: (themeMode: ThemeMode) => void;
+  toggleThemeMode: () => void;
+};
+
+const getDefaultThemeMode = (): ThemeMode => {
+  if (typeof window === "undefined") return "light";
+
+  const themeMode = localStorage.getItem("ui-theme-mode") as ThemeMode,
+    systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+
+  return themeMode ?? systemTheme ?? "light";
 };
 
 const initialState: ThemeModeProviderState = {
-  themeMode: "system",
+  themeMode: getDefaultThemeMode(),
   setThemeMode: () => null,
+  toggleThemeMode: () => null,
 };
 
 const ThemeModeProviderContext =
@@ -23,7 +36,7 @@ const ThemeModeProviderContext =
 
 export function ThemeModeProvider({
   children,
-  defaultThemeMode = "system",
+  defaultThemeMode = getDefaultThemeMode(),
   storageKey = "ui-theme-mode",
   ...props
 }: ThemeModeProviderProps) {
@@ -35,18 +48,8 @@ export function ThemeModeProvider({
     const root = window.document.documentElement;
 
     root.classList.remove("light", "dark");
-
-    if (themeMode === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      root.classList.add(systemTheme);
-      return;
-    }
-
     root.classList.add(themeMode);
+    localStorage.setItem(storageKey, themeMode);
   }, [themeMode]);
 
   const value = {
@@ -54,6 +57,9 @@ export function ThemeModeProvider({
     setThemeMode: (themeMode: ThemeMode) => {
       localStorage.setItem(storageKey, themeMode);
       setThemeMode(themeMode);
+    },
+    toggleThemeMode: () => {
+      setThemeMode((themeMode) => (themeMode === "light" ? "dark" : "light"));
     },
   };
 
