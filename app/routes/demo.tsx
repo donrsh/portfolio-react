@@ -1,4 +1,5 @@
 import { Link, Outlet } from "@remix-run/react";
+import { Typography } from "~/lib/ui/typogrphy";
 
 export default function Layout() {
   return (
@@ -7,9 +8,11 @@ export default function Layout() {
         <Link to="/">Home</Link>
       </div>
 
-      <div>
-        <h1 style={{ fontSize: "1.5rem", marginBlock: 16 }}>Demo</h1>
-        <Outlet />
+      <div className="p-4 -mt-4">
+        <Typography variant="h2">Demo</Typography>
+        <div className="py-2">
+          <Outlet />
+        </div>
       </div>
     </>
   );
