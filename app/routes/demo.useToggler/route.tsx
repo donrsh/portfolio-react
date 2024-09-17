@@ -1,6 +1,7 @@
 import useToggler from "@lib-react/hooks/useToggler";
 import SourceCodeRefs from "~/components/ui/SourceCodeRefs";
 import { sourceCodeReferences } from "./metadata";
+import { Button } from "~/lib/ui/button";
 
 const popoverId = "popover";
 
@@ -18,33 +19,38 @@ export default function Page() {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div className="flex gap-2 mb-4">
         {animals.map((animal) => (
-          <button
+          <Button
             key={animal.name}
             onClick={() => animalPopover.openWithData(animal)}
             style={{ width: "fit-content" }}
           >
             {animal.name}
-          </button>
+          </Button>
         ))}
       </div>
 
-      <dialog open={animalPopover.isOpen}>
-        <button onClick={animalPopover.close}>╳</button>
+      <dialog
+        className="border-2 border-gray-300 dark:bg-black dark:text-white"
+        open={animalPopover.isOpen}
+      >
+        <Button
+          variant="outline"
+          className="border-0 absolute top-0 right-0"
+          onClick={animalPopover.close}
+        >
+          ╳
+        </Button>
         <br />
         <div id={popoverId}>
-          <span style={{ fontSize: 256 }}>{animalPopover.data?.emoji}</span>
+          <span className="m-4 text-[256px]">{animalPopover.data?.emoji}</span>
         </div>
       </dialog>
 
       <hr />
 
-      <SourceCodeRefs
-        open
-        data={sourceCodeReferences}
-        style={{ marginBlock: 16 }}
-      />
+      <SourceCodeRefs open data={sourceCodeReferences} />
     </>
   );
 }
