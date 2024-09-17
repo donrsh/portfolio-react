@@ -1,6 +1,6 @@
 import React from "react";
 import useHorizontalScroll from "@lib-react/hooks/useHorizontalScroll";
-import SourceCodeRefs from "@lib-react/components/SourceCodeRefs";
+import SourceCodeRefs from "~/components/ui/SourceCodeRefs";
 import { sourceCodeReferences } from "./metadata";
 
 export default function Page() {

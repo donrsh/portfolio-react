@@ -6,9 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import SourceCodeRefs, {
-  ReferenceEntry,
-} from "@lib-react/components/SourceCodeRefs";
+import SourceCodeRefs from "~/components/ui/SourceCodeRefs";
 import { sourceCodeReferences } from "./metadata";
 
 type Auth = { name: string };

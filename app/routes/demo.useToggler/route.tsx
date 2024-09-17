@@ -1,5 +1,5 @@
 import useToggler from "@lib-react/hooks/useToggler";
-import SourceCodeRefs from "@lib-react/components/SourceCodeRefs";
+import SourceCodeRefs from "~/components/ui/SourceCodeRefs";
 import { sourceCodeReferences } from "./metadata";
 
 const popoverId = "popover";
