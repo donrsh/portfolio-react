@@ -30,8 +30,11 @@ export default function Index() {
         This site serves as a portfolio of my{" "}
         <ExternalLink href="https://react.dev/">React</ExternalLink> skill. It
         is based on <ExternalLink href="https://vitejs.dev/">Vite</ExternalLink>{" "}
-        and <ExternalLink href="https://remix.run/">Remix</ExternalLink>, and
-        also an app under my{" "}
+        and <ExternalLink href="https://remix.run/">Remix</ExternalLink> (in{" "}
+        <ExternalLink href="https://remix.run/docs/en/main/guides/spa-mode">
+          SPA mode
+        </ExternalLink>
+        ), and also an app under my{" "}
         <ExternalLink href="https://github.com/donrsh/web-apps-workspace/tree/main">
           web apps workspace
         </ExternalLink>{" "}
