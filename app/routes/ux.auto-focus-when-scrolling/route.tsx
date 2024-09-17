@@ -6,6 +6,10 @@ import {
   useAutoFocusWhenScrollingStore,
 } from "./store";
 import useHorizontalScroll from "@lib-react/hooks/useHorizontalScroll";
+import { Label } from "~/lib/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/lib/ui/radio-group";
+import { Typography } from "~/lib/ui/typogrphy";
+import { Button } from "~/lib/ui/button";
 
 type Item = {
   id: any;
@@ -64,18 +68,20 @@ const Sub = createSub({
     }, [focusItemKey]);
 
     return (
-      <div style={{ marginBottom: 20 }}>
-        <code>
-          <b>scrolling direction</b>: <code>{scrollingDirection}</code>
-        </code>
-        <br />
-        <code>
-          <b>items in view</b>: {inViewItems.map((x) => x?.title).join(", ")}
-        </code>
-        <br />
-        <code>
-          <b>focus item</b>: {focusItem?.title}
-        </code>
+      <div className="my-4">
+        <Typography variant="large">Status</Typography>
+        <div>
+          <Typography variant="inlineCode">scrolling direction</Typography>:{" "}
+          <code>{scrollingDirection}</code>
+        </div>
+        <div>
+          <Typography variant="inlineCode">items in view</Typography>:{" "}
+          {inViewItems.map((x) => x?.title).join(", ")}
+        </div>
+        <div>
+          <Typography variant="inlineCode">focus item</Typography>:{" "}
+          {focusItem?.title}
+        </div>
       </div>
     );
   },
@@ -88,20 +94,12 @@ const Sub = createSub({
     return (
       <div
         ref={ref}
-        style={{
-          borderBottom: "1px solid gray",
-          paddingInline: 8,
-          cursor: "pointer",
-          width: "100px",
-          flexShrink: 0,
-        }}
+        className={`border-b-2 border-gray-300 p-2 cursor-pointer w-[120px] shrink-0 text-center ${isFocus ? "opacity-100" : "opacity-40"}`}
         onClick={focus}
       >
-        <div style={{ opacity: isFocus ? 1 : 0.4 }}>
-          <p>
-            <b>{title}</b>
-          </p>
-        </div>
+        <p>
+          <b>{title}</b>
+        </p>
       </div>
     );
   },
@@ -126,12 +124,9 @@ const Sub = createSub({
     return (
       <div
         ref={ref as any}
+        className={`overflow-auto flex flex-none border-gray-300 ${scrollerDirection === "vertical" ? "border-r " : ""} `}
         style={{
           height: scrollerDirection === "vertical" ? "100%" : "fit-content",
-          background: "lightgray",
-          overflow: "auto",
-          flex: "none",
-          display: "flex",
           flexDirection: scrollerDirection === "horizontal" ? "row" : "column",
         }}
       >
@@ -139,17 +134,13 @@ const Sub = createSub({
           return <Sub.Item key={x.id} {...x} />;
         })}
         <div
+          className="sticky"
           style={{
-            position: "sticky",
             [scrollerDirection === "horizontal" ? "right" : "bottom"]: 0,
           }}
         >
-          <button
-            style={{ width: 100 }}
-            onClick={addItem}
-          >{`Add an item`}</button>
+          <Button onClick={addItem}>{`Add an item`}</Button>
         </div>
-        <div style={{ height: "100%" }} />
       </div>
     );
   },
@@ -163,13 +154,11 @@ const Sub = createSub({
 
     return (
       focusItem && (
-        <div>
-          <div>
-            <p>
-              <b>{focusItem.title}</b>
-            </p>
-            <p>{focusItem.text}</p>
-          </div>
+        <div className="p-4">
+          <Typography variant="large" className="-mb-3">
+            {focusItem.title}
+          </Typography>
+          <Typography variant="p">{focusItem.text}</Typography>
         </div>
       )
     );
@@ -181,22 +170,21 @@ export default function Page() {
     useState<ScrollerDirection>("vertical");
 
   return (
-    <>
-      <h1>Auto Focus when Scrolling</h1>
-      <div>
-        <b>Scroller Direction</b>
-        {(["vertical", "horizontal"] as ScrollerDirection[]).map((x) => (
-          <label key={x}>
-            <input
-              type="radio"
-              name="scrollerDirection"
-              value={x}
-              onChange={() => setScrollerDirection(x)}
-              checked={scrollerDirection === x}
-            />
-            {x}
-          </label>
-        ))}
+    <div className="px-4">
+      <div className="flex gap-2 mb-2">
+        <Label>Scroller Direction</Label>
+        <RadioGroup className="flex gap-2" value={scrollerDirection}>
+          {(["vertical", "horizontal"] as ScrollerDirection[]).map((x) => (
+            <div
+              key={x}
+              className="flex items-center gap-2"
+              onClick={() => setScrollerDirection(x)}
+            >
+              <RadioGroupItem key={x} value={x} />
+              <Label>{x}</Label>
+            </div>
+          ))}
+        </RadioGroup>
       </div>
       <hr />
       <AutoFocusWhenScrollingProvider
@@ -205,20 +193,16 @@ export default function Page() {
       >
         <Sub.Status />
         <div
+          className="w-full flex h-[300px] border border-gray-300"
           style={{
-            width: "100%",
-            display: "flex",
             flexDirection:
               scrollerDirection === "horizontal" ? "column" : "row",
-            gap: 20,
-            height: 300,
-            border: "1px solid gray",
           }}
         >
           <Sub.Items {...{ scrollerDirection }} />
           <Sub.FocusItem />
         </div>
       </AutoFocusWhenScrollingProvider>
-    </>
+    </div>
   );
 }

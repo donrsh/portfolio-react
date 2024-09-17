@@ -5,6 +5,8 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { ThemeModeProvider } from "~/components/provider/theme-mode";
+import { AppHeader } from "./components/ui/app-header";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -34,7 +36,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <ThemeModeProvider>
+      <AppHeader />
+      <Outlet />
+    </ThemeModeProvider>
+  );
 }
 
 export function HydrateFallback() {

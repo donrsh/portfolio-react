@@ -6,10 +6,21 @@ import {
   useRef,
   useState,
 } from "react";
-import SourceCodeRefs, {
-  ReferenceEntry,
-} from "@lib-react/components/SourceCodeRefs";
+import SourceCodeRefs from "~/components/ui/SourceCodeRefs";
 import { sourceCodeReferences } from "./metadata";
+import { Button } from "~/lib/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/lib/ui/dialog";
+import { Typography } from "~/lib/ui/typogrphy";
+import { Input } from "~/lib/ui/input";
+import { TimerResetIcon, LogOutIcon } from "lucide-react";
+import { T } from "ramda";
 
 type Auth = { name: string };
 
@@ -65,48 +76,66 @@ export default function Page() {
 
   return (
     <>
-      <div>
+      <div className="mb-4">
         {!currentAuth ? (
-          <button onClick={prompt}>Click to start!</button>
+          <Dialog
+            open={isPrompting}
+            onOpenChange={(open) => {
+              if (!open) {
+                promptCancel();
+              }
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button onClick={prompt}>Click to start!</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <form {...{ onSubmit }}>
+                  <Typography>What's your name?</Typography>
+                  <Input type="text" name="name" id="" />
+                  <br />
+
+                  <div className="mt-4 flex items-center gap-2">
+                    <Button
+                      type="button"
+                      onClick={promptCancel}
+                      variant="outline"
+                      className="ml-auto"
+                    >
+                      cancel
+                    </Button>
+                    <Button type="submit">confirm</Button>
+                  </div>
+                </form>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         ) : (
           <>
-            <div>
-              Hi, {currentAuth.name} {timeToExpire && timeToExpire + "s"}
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => prolong(5 * 60 * 1_000)}>
+            <Typography variant="large">Hi, {currentAuth.name}</Typography>
+            <Typography variant="muted" className="min-h-10">
+              {timeToExpire
+                ? `Your session will expire in ${timeToExpire} seconds`
+                : " "}
+            </Typography>
+            <div className="flex gap-2">
+              <Button onClick={() => prolong(5 * 60 * 1_000)} size="sm">
+                <TimerResetIcon className="mr-2" />
                 prolong 5 mins
-              </button>
-              <button onClick={clear}>leave</button>
+              </Button>
+              <Button onClick={clear} size="sm">
+                <LogOutIcon className="mr-2" />
+                leave
+              </Button>
             </div>
           </>
         )}
       </div>
-      <dialog ref={dialogElRef as any}>
-        <form {...{ onSubmit }}>
-          <p>What's your name?</p>
-          <input type="text" name="name" id="" />
-          <br />
-
-          <div
-            className="row-vcenter"
-            style={{ marginTop: 20, justifyContent: "space-between" }}
-          >
-            <button type="button" onClick={promptCancel}>
-              cancel
-            </button>
-            <button type="submit">confirm</button>
-          </div>
-        </form>
-      </dialog>
 
       <hr />
 
-      <SourceCodeRefs
-        open
-        data={sourceCodeReferences}
-        style={{ marginBlock: 16 }}
-      />
+      <SourceCodeRefs open data={sourceCodeReferences} />
     </>
   );
 }
