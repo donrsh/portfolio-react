@@ -54,7 +54,7 @@ export default function Index() {
 
       <Accordion type="multiple" defaultValue={["demos", "applets", "ux"]}>
         <AccordionItem value="demos">
-          <AccordionTrigger className="text-lg">Demos</AccordionTrigger>
+          <AccordionTrigger className="text-lg">Demos (4)</AccordionTrigger>
           <AccordionContent>
             <Typography variant="ul">
               <li>
@@ -95,7 +95,7 @@ export default function Index() {
         </AccordionItem>
 
         <AccordionItem value="applets">
-          <AccordionTrigger className="text-lg">Applets</AccordionTrigger>
+          <AccordionTrigger className="text-lg">Applets (1)</AccordionTrigger>
           <AccordionContent>
             <Typography variant="ul">
               <li>
@@ -110,7 +110,7 @@ export default function Index() {
         </AccordionItem>
 
         <AccordionItem value="ux">
-          <AccordionTrigger className="text-lg">UX</AccordionTrigger>
+          <AccordionTrigger className="text-lg">UX (1)</AccordionTrigger>
           <AccordionContent>
             <Typography variant="ul">
               <li>
