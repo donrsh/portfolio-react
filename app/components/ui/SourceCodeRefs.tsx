@@ -30,15 +30,12 @@ function SourceCodeRefs({
           {title}
         </AccordionTrigger>
         <AccordionContent>
-          <ul>
+          <ul className="list-inside list-disc">
             {data.map((x, idx) => {
               return (
-                <li key={idx}>
-                  <div className="py-0.5">
-                    <span style={{ fontWeight: 500 }}>{x.title}</span> (
-                    <Link href={x.link}>Link</Link>)
-                  </div>
-                  <p>{x.description}</p>
+                <li key={idx} className="list-item mb-1">
+                  <span style={{ fontWeight: 500 }}>{x.title}</span> (
+                  <Link href={x.link}>Link</Link>)
                 </li>
               );
             })}
