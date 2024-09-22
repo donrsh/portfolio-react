@@ -154,7 +154,7 @@ const Sub = createSub({
 
     return (
       focusItem && (
-        <div className="p-4">
+        <div className="p-4 overflow-auto">
           <Typography variant="large" className="-mb-3">
             {focusItem.title}
           </Typography>
