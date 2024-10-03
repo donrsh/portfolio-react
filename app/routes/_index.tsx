@@ -110,13 +110,20 @@ export default function Index() {
         </AccordionItem>
 
         <AccordionItem value="ux">
-          <AccordionTrigger className="text-lg">UX (1)</AccordionTrigger>
+          <AccordionTrigger className="text-lg">UX (2)</AccordionTrigger>
           <AccordionContent>
             <Typography variant="ul">
               <li>
                 <Link asChild>
                   <RemixLink to="/ux/auto-focus-when-scrolling">
                     Auto Focus when Scrolling
+                  </RemixLink>
+                </Link>
+              </li>
+              <li>
+                <Link asChild>
+                  <RemixLink to="/ux/handle-image-input">
+                    Handle Image Input
                   </RemixLink>
                 </Link>
               </li>
