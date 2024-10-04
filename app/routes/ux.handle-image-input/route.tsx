@@ -57,13 +57,12 @@ const Sub = createSub({
 
     return (
       <div>
-        <div className="flex items-center gap-2 mb-2">
+        <div className="mb-2">
           <Typography variant="large">{title}</Typography>
-          <span>-</span>
-          <div>
+          <Typography variant="small" className="opacity-70">
             Paste images (Ctrl / Cmd + V) or{" "}
             <Sub.ImageFileInput addImage={addImage} />
-          </div>
+          </Typography>
         </div>
         <div
           tabIndex={0}
